@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { createBridgeLogStore } from '../src/stores/bridge-log-store.ts';
 
-test('方法日志记录成功、失败、超时和参数错误的脱敏结果契约', () => {
+test('方法日志记录成功、失败、超时和参数错误的原始结果契约', () => {
   const store = createBridgeLogStore();
 
   store.recordMethod({
@@ -12,7 +12,7 @@ test('方法日志记录成功、失败、超时和参数错误的脱敏结果�
     startedAt: 100,
     duration: 25,
     status: 'success',
-    result: { email: '[已脱敏]' },
+    result: { email: 'person@example.com' },
   });
   store.recordMethod({
     id: 'method-timeout',
@@ -39,7 +39,7 @@ test('方法日志记录成功、失败、超时和参数错误的脱敏结果�
       startedAt: 100,
       duration: 25,
       status: 'success',
-      result: { email: '[已脱敏]' },
+      result: { email: 'person@example.com' },
     },
     {
       id: 'method-timeout',

@@ -43,7 +43,7 @@ test('首页提供 Persik 入口，View 页面保持稳定 ID', async () => {
   }
 });
 
-test('日志页将状态映射为中文并显示时间、方法、耗时和脱敏结果', async () => {
+test('日志页将状态映射为中文并显示时间、方法、耗时和原始结果', async () => {
   const logs = await readFile('src/panels/Logs.tsx', 'utf8');
 
   assert.match(logs, /new Date\(entry\.startedAt\)/u);

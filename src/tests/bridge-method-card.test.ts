@@ -115,7 +115,7 @@ test('卡片使用 fake Bridge 成功结果、恢复 loading 并写入日志', a
   assert.equal(lastState?.runResult?.status, 'success');
   assert.deepEqual(lastState?.runResult?.result, {
     id: 7,
-    email: '[已脱敏]',
+    email: 'person@example.com',
   });
 });
 

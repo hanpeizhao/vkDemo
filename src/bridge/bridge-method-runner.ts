@@ -35,9 +35,6 @@ export type RunBridgeMethodOptions = Readonly<{
 }>;
 
 const DEFAULT_TIMEOUT_MS = 10_000;
-const MASKED_VALUE = '[已脱敏]';
-const sensitiveKeyPattern = /access[\s_-]*token|token|secret|hash|phone|mobile|email|密码|手机号|手机号码|邮箱/iu;
-
 class BridgeTimeoutError extends Error {
   constructor(method: string) {
     super(`调用 ${method} 超时，请检查 VK 环境后重试。`);
@@ -91,48 +88,6 @@ export const parseBridgeParams = (text: string): BridgeParamsParseResult => {
   return { ok: true, params: parsed };
 };
 
-export const sanitizeBridgeValue = (value: unknown): unknown => {
-  const seen = new WeakMap<object, unknown>();
-
-  const sanitize = (currentValue: unknown): unknown => {
-    if (Array.isArray(currentValue)) {
-      const existingValue = seen.get(currentValue);
-      if (existingValue !== undefined) {
-        return existingValue;
-      }
-
-      const sanitizedArray: unknown[] = [];
-      seen.set(currentValue, sanitizedArray);
-
-      for (const item of currentValue) {
-        sanitizedArray.push(sanitize(item));
-      }
-
-      return sanitizedArray;
-    }
-
-    if (!isRecord(currentValue)) {
-      return currentValue;
-    }
-
-    const existingValue = seen.get(currentValue);
-    if (existingValue !== undefined) {
-      return existingValue;
-    }
-
-    const sanitizedObject: Record<string, unknown> = {};
-    seen.set(currentValue, sanitizedObject);
-
-    for (const [key, nestedValue] of Object.entries(currentValue)) {
-      sanitizedObject[key] = sensitiveKeyPattern.test(key) ? MASKED_VALUE : sanitize(nestedValue);
-    }
-
-    return sanitizedObject;
-  };
-
-  return sanitize(value);
-};
-
 export const runBridgeMethod = async ({
   method,
   params,
@@ -162,7 +117,7 @@ export const runBridgeMethod = async ({
     return {
       status: 'success',
       durationMs: getDurationMs(startedAt),
-      result: sanitizeBridgeValue(response) as Readonly<Record<string, unknown>>,
+      result: response,
       error: null,
       errorType: null,
     };

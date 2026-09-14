@@ -6,7 +6,6 @@ import test from 'node:test';
 import {
   parseBridgeParams,
   runBridgeMethod,
-  sanitizeBridgeValue,
 } from '../bridge/bridge-method-runner.ts';
 
 test('参数解析以 ok 字段判别结果，并接受含 error 字段的合法参数对象', () => {
@@ -18,16 +17,6 @@ test('参数解析以 ok 字段判别结果，并接受含 error 字段的合法
     ok: false,
     error: '参数不是合法的 JSON。',
   });
-});
-
-test('递归脱敏保留自引用数组而不无限递归', () => {
-  const values: unknown[] = [];
-  values.push(values);
-
-  const sanitized = sanitizeBridgeValue(values) as unknown[];
-
-  assert.notEqual(sanitized, values);
-  assert.equal(sanitized[0], sanitized);
 });
 
 test('空文本和 JSON 对象会解析为可调用参数', () => {
@@ -52,28 +41,7 @@ test('非法 JSON 与非对象参数返回可展示的中文错误', () => {
   }
 });
 
-test('递归脱敏嵌套对象和数组中的敏感字段并保留结构', () => {
-  assert.deepEqual(
-    sanitizeBridgeValue({
-      user: {
-        access_token: 'token-value',
-        contacts: [{ phone: '+79990001122', email: 'person@example.com' }],
-      },
-      response_hash: 'hash-value',
-      visible: '保留此字段',
-    }),
-    {
-      user: {
-        access_token: '[已脱敏]',
-        contacts: [{ phone: '[已脱敏]', email: '[已脱敏]' }],
-      },
-      response_hash: '[已脱敏]',
-      visible: '保留此字段',
-    },
-  );
-});
-
-test('成功调用返回脱敏结果、状态和耗时', async () => {
+test('成功调用保留原始返回结果、状态和耗时', async () => {
   let receivedMethod = '';
   let receivedParams: Record<string, unknown> = {};
 
@@ -91,7 +59,7 @@ test('成功调用返回脱敏结果、状态和耗时', async () => {
   assert.equal(receivedMethod, 'VKWebAppGetUserInfo');
   assert.deepEqual(receivedParams, { fields: 'email' });
   assert.equal(result.status, 'success');
-  assert.deepEqual(result.result, { id: 7, email: '[已脱敏]' });
+  assert.deepEqual(result.result, { id: 7, email: 'person@example.com' });
   assert.equal(typeof result.durationMs, 'number');
   assert.ok(result.durationMs >= 0);
 });

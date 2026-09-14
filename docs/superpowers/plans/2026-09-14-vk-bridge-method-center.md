@@ -4,7 +4,7 @@
 
 **Goal:** 将 Persik 页面改造成 VK Bridge 方法测试中心，按能力分类展示官方方法，提供参数编辑、调用、结果、错误、耗时和调试日志，并让无法在当前容器运行的方法以清晰状态呈现。
 
-**Architecture:** 使用独立的官方方法注册表驱动分类和页面；使用纯函数负责 JSON 参数解析、敏感字段脱敏、方法调用超时和结果归一化；使用受类型约束的 Bridge 适配层调用 VK Bridge。Persik 负责展示和交互，调试日志页面负责查看当前会话记录。
+**Architecture:** 使用独立的官方方法注册表驱动分类和页面；使用纯函数负责 JSON 参数解析、方法调用超时和结果归一化；使用受类型约束的 Bridge 适配层调用 VK Bridge。Persik 负责展示和交互，调试日志页面负责查看当前会话记录。
 
 **Tech Stack:** React 18、TypeScript、VKUI、VK Bridge、Vite、Node test runner。
 
@@ -39,18 +39,18 @@
 node --experimental-strip-types --test src/tests/bridge-methods.test.ts
 ```
 
-## Task 2: 实现参数解析、脱敏、调用和超时执行器
+## Task 2: 实现参数解析、调用和超时执行器
 
 **Files:**
 - Create: `src/bridge/bridge-method-runner.ts`
 - Create: `src/tests/bridge-method-runner.test.ts`
 
 - [ ] 实现 `parseBridgeParams(text)`：空文本解析为 `{}`；非法 JSON 返回中文错误；只接受 JSON 对象，数组、字符串、数字和 `null` 返回参数格式错误。
-- [ ] 实现 `sanitizeBridgeValue(value)`：递归处理对象和数组，对 token、access token、secret、hash、手机号、邮箱等字段进行掩码，同时保留调试所需的字段结构。
-- [ ] 实现 `runBridgeMethod({ method, params, send, timeoutMs })`：记录开始时间，调用 `send(method, params)`，统一返回 success/error/timeout 状态、耗时和脱敏后的结果。
+- [x] 不对 Bridge 返回结果做脱敏，保留完整字段和值供调试查看。
+- [ ] 实现 `runBridgeMethod({ method, params, send, timeoutMs })`：记录开始时间，调用 `send(method, params)`，统一返回 success/error/timeout 状态、耗时和原始结果。
 - [ ] 使用可取消的超时竞争，确保 Bridge 永不返回时 UI 也能结束加载；超时错误必须是中文且包含方法名。
 - [ ] 将异常、Bridge reject、非对象结果统一转为可展示的错误信息，保留原始错误类型供日志判断。
-- [ ] 测试成功、拒绝、非法参数、超时、嵌套敏感字段和耗时字段；测试不得依赖真实 VK 容器。
+- [ ] 测试成功、拒绝、非法参数、超时和耗时字段；测试不得依赖真实 VK 容器。
 
 验证命令：
 
@@ -68,7 +68,7 @@ node --experimental-strip-types --test src/tests/bridge-method-runner.test.ts
 - [ ] 使用 VKUI 组件实现方法卡片：分类标签、方法名、中文说明、风险/环境提示、JSON 参数编辑框、调用按钮、加载状态和结果区域。
 - [ ] 参数编辑框显示格式化后的默认 JSON，并在调用前执行解析；参数错误只显示在当前卡片，不影响其他方法。
 - [ ] 调用期间禁用当前按钮并显示明确的加载反馈；超时或异常后恢复可操作状态。
-- [ ] 成功结果展示脱敏后的 JSON；错误展示中文错误、Bridge 方法名和耗时；无法在普通浏览器执行的方法给出“请在 VK Mini App 环境中测试”。
+- [ ] 成功结果展示原始 JSON；错误展示中文错误、Bridge 方法名和耗时；无法在普通浏览器执行的方法给出“请在 VK Mini App 环境中测试”。
 - [ ] 通过 props 注入 `send` 和日志回调，组件测试使用 fake Bridge，不直接依赖全局 `window.vkBridge`。
 - [ ] 测试渲染、参数校验、成功结果、失败结果、按钮禁用和错误后恢复。
 
@@ -92,7 +92,7 @@ yarn test
 - [ ] 按十个分类渲染分类导航；点击分类只筛选当前页面方法，或者通过稳定 URL 参数/路由进入分类，不能依赖 React Fragment 作为 `View` 直接子节点。
 - [ ] 在 Persik 页面调用 `BridgeMethodCard`，注入真实 `bridge.send`、全局超时和日志写入函数。
 - [ ] 对 `VKWebAppInit`、用户信息、复制文本、存储、分享、打开链接等首批方法提供可直接测试的入口；需要用户操作的方法必须保留确认提示。
-- [ ] 将成功、失败、超时、参数错误写入现有日志存储；Logs 页面显示时间、方法名、状态、耗时和脱敏结果。
+- [ ] 将成功、失败、超时、参数错误写入现有日志存储；Logs 页面显示时间、方法名、状态、耗时和原始结果。
 - [ ] 从首页增加或调整进入测试中心的入口，并保证现有能力分类页、日志页、返回按钮和页面直达 URL 正常。
 - [ ] 测试 `View` 的每个子页面有稳定 `id`，分类跳转使用路径而不是 panel ID，测试中心路径可直接打开。
 
@@ -130,7 +130,7 @@ yarn build
 - [ ] 运行 `yarn lint` 或项目中实际配置的 ESLint 命令，确认无新增 lint 错误。
 - [ ] 运行 `git diff --check`，确认无空白错误。
 - [ ] 检查 `git status --short`，确认未生成 `dist`、`build`、`.env`、日志临时文件或 `node_modules` 变更。
-- [ ] 手动检查：普通浏览器加载不无限转圈；Bridge 未返回时能在超时后恢复；VK 容器中可看到真实结果；日志中的 token 和个人敏感信息已脱敏。
+- [ ] 手动检查：普通浏览器加载不无限转圈；Bridge 未返回时能在超时后恢复；VK 容器中可看到真实结果；日志中显示返回结果的完整字段和值。
 - [ ] 在交付说明中列出修改文件、验证命令及普通浏览器与 VK 环境的能力差异。
 
 ## Review Checklist
