@@ -11,6 +11,8 @@ test('Persik 测试中心以注册表渲染分类筛选、方法卡片和容器�
   assert.match(content, /<BridgeMethodCard/u);
   assert.match(content, /需要用户操作/u);
   assert.match(content, /VK Mini App/u);
+  assert.match(content, /persik-category-scroll/u);
+  assert.match(content, /persik-method-summary/u);
 });
 
 test('Persik 将真实 Bridge send 和日志回调从 App 注入卡片', async () => {
@@ -56,4 +58,15 @@ test('日志页将状态映射为中文并显示时间、方法、耗时和原�
   assert.match(logs, /JSON\.stringify\(entry\.result/u);
   assert.match(logs, /PanelHeaderBack/u);
   assert.match(logs, /routeNavigator\.back\(\)/u);
+});
+
+test('Bridge 方法卡片为移动端和长 JSON 结果提供稳定的响应式容器', async () => {
+  const card = await readFile('src/components/BridgeMethodCard.tsx', 'utf8');
+  const styles = await readFile('src/styles.css', 'utf8');
+
+  assert.match(card, /bridge-method-card/u);
+  assert.match(card, /bridge-method-result/u);
+  assert.match(styles, /\.persik-category-scroll[\s\S]*overflow-x:\s*auto/u);
+  assert.match(styles, /\.bridge-method-result[\s\S]*overflow-x:\s*auto/u);
+  assert.match(styles, /overflow-wrap:\s*anywhere/u);
 });

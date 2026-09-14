@@ -19,21 +19,23 @@ export const Persik: FC<PersikProps> = ({ id, send, onLog, onValidationError }) 
   return (
     <Panel id={id}>
       <PanelHeader fixed={false} before={<PanelHeaderBack onClick={() => routeNavigator.back()} />}>
-        VK Bridge 方法测试中心
+        <span className="persik-header-title">VK Bridge 方法测试中心</span>
       </PanelHeader>
       <Group header={<Header size="s">分类</Header>}>
-        <SegmentedControl
-          value={categoryId}
-          onChange={(value) => setCategoryId(value as BridgeMethodCategoryId)}
-          options={bridgeMethodCategories.map((category) => ({ label: category.title, value: category.id }))}
-        />
+        <div className="persik-category-scroll">
+          <SegmentedControl
+            value={categoryId}
+            onChange={(value) => setCategoryId(value as BridgeMethodCategoryId)}
+            options={bridgeMethodCategories.map((category) => ({ label: category.title, value: category.id }))}
+          />
+        </div>
       </Group>
       <Group header={<Header size="s">Bridge 方法</Header>}>
-        <Text>
+        <Text className="persik-method-summary">
           共 {bridgeMethods.length} 个方法。请在 VK Mini App 环境中测试容器专用能力；标记“需要用户操作”的方法可能打开授权或确认界面。
         </Text>
         <Spacing size="s" />
-        <CardGrid size="l">
+        <CardGrid className="persik-method-grid" size="l">
           {selectedMethods.map((method) => (
             <BridgeMethodCard key={method.name} method={method} send={send} onLog={onLog} onValidationError={onValidationError} />
           ))}

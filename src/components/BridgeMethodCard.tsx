@@ -87,7 +87,7 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
   };
 
   return (
-    <Card mode="outline">
+    <Card className="bridge-method-card" mode="outline">
       <Box padding="m">
         <Box style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <ContentBadge mode="secondary" appearance="neutral" size="s">
@@ -146,7 +146,7 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
         )}
 
         {runResult && (
-          <Box paddingBlockStart="m">
+          <Box className="bridge-method-result" paddingBlockStart="m">
             <Text>
               {getBridgeMethodResultTitle(runResult.status)}：{method.name}（{runResult.durationMs} ms）
             </Text>

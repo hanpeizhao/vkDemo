@@ -9,6 +9,7 @@ import { DEFAULT_VIEW_PANELS } from './routes';
 import type { BridgeMethodRunResult, BridgeMethodSend } from './bridge/bridge-method-runner';
 import { createBridgeLogStore } from './stores/bridge-log-store';
 import type { BridgeLogEntry, BridgeMethodLog } from './panels/Logs';
+import './styles.css';
 
 export const App = () => {
   const { panel: activePanel = DEFAULT_VIEW_PANELS.HOME } = useActiveVkuiLocation();
