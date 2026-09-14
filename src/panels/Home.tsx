@@ -31,12 +31,12 @@ export const Home: FC<HomeProps> = ({ id, fetchedUser, userError }) => {
             key={category.id}
             before={<span aria-hidden="true">{category.icon}</span>}
             subtitle={`${category.capabilities.length} 项测试 · ${category.description}`}
-            onClick={() => routeNavigator.push(category.id)}
+            onClick={() => routeNavigator.push(`/category/${category.id}`)}
           >
             {category.title}
           </Cell>
         ))}
-        <Cell onClick={() => routeNavigator.push('logs')} subtitle="查看当前会话中的测试记录">
+        <Cell onClick={() => routeNavigator.push('/logs')} subtitle="查看当前会话中的测试记录">
           调试日志
         </Cell>
       </Group>
