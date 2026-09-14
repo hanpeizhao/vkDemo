@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import bridge, { UserInfo } from '@vkontakte/vk-bridge';
 import { SplitCol, SplitLayout, View } from '@vkontakte/vkui';
 import { useActiveVkuiLocation } from '@vkontakte/vk-mini-apps-router';
@@ -63,11 +63,10 @@ export const App = () => {
         <View activePanel={activePanel}>
           <Home id="home" fetchedUser={fetchedUser} userError={userError} />
           <Persik id="persik" />
-          <Fragment>
-            {capabilityCategories.filter(({ id }) => id !== 'logs').map((category) => (
-              <Category key={category.id} id={category.id} category={category} onRun={run} />
-            ))}
-          </Fragment>
+          <Category id="basic" category={capabilityCategories.find(({ id }) => id === 'basic')!} onRun={run} />
+          <Category id="bridge" category={capabilityCategories.find(({ id }) => id === 'bridge')!} onRun={run} />
+          <Category id="components" category={capabilityCategories.find(({ id }) => id === 'components')!} onRun={run} />
+          <Category id="layout" category={capabilityCategories.find(({ id }) => id === 'layout')!} onRun={run} />
           <Logs id="logs" entries={logs} onClear={() => setLogs([])} />
         </View>
       </SplitCol>
