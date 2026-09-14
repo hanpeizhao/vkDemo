@@ -20,15 +20,19 @@ export type BridgeMethodCategory = Readonly<{
   description: string;
 }>;
 
+interface BridgeMethodDefaultParamObject {
+  readonly [key: string]: BridgeMethodDefaultParam;
+}
+
 type BridgeMethodDefaultParam =
   | string
   | number
   | boolean
   | null
   | readonly BridgeMethodDefaultParam[]
-  | Readonly<Record<string, BridgeMethodDefaultParam>>;
+  | BridgeMethodDefaultParamObject;
 
-type BridgeMethodDefaultParams = Readonly<Record<string, BridgeMethodDefaultParam>>;
+type BridgeMethodDefaultParams = BridgeMethodDefaultParamObject;
 
 export type BridgeMethod = Readonly<{
   name: string;
