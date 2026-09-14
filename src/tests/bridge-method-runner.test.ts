@@ -75,9 +75,27 @@ test('被拒绝的调用返回中文错误和原始错误类型', async () => {
   });
 
   assert.deepEqual(result.status, 'error');
-  assert.equal(result.error, '调用 VKWebAppGetUserInfo 失败，请检查 VK 环境或参数。');
+  assert.equal(result.error, '调用 VKWebAppGetUserInfo 失败：容器拒绝调用');
   assert.equal(result.errorType, 'TypeError');
   assert.equal(typeof result.durationMs, 'number');
+});
+
+test('VK Bridge 错误对象会保留错误类型和具体错误信息', async () => {
+  const result = await runBridgeMethod({
+    method: 'VKWebAppStorageGet',
+    params: { key: 'demo' },
+    send: async () => {
+      throw {
+        error_type: 'storage_error',
+        error_data: '存储权限未开启',
+      };
+    },
+    timeoutMs: 100,
+  });
+
+  assert.equal(result.status, 'error');
+  assert.equal(result.error, '调用 VKWebAppStorageGet 失败：存储权限未开启');
+  assert.equal(result.errorType, 'storage_error');
 });
 
 test('非对象调用结果返回可展示的中文错误', async () => {

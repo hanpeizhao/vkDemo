@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Button, Cell, Group, Header, NavIdProps, Panel, PanelHeader, PanelHeaderBack, Placeholder } from '@vkontakte/vkui';
+import { Button, Cell, Group, Header, NavIdProps, Panel, PanelHeader, PanelHeaderBack, Placeholder, Text } from '@vkontakte/vkui';
 import { useRouteNavigator } from '@vkontakte/vk-mini-apps-router';
 import type { BridgeLog } from '../bridge/log-types';
 
@@ -46,6 +46,11 @@ export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => {
             <pre style={{ margin: '8px 0 0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {JSON.stringify(entry.result, null, 2)}
             </pre>
+          )}
+          {entry.error && (
+            <Text style={{ marginTop: 8, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+              错误详情：{entry.error.message}{entry.error.code ? `（类型：${entry.error.code}）` : ''}
+            </Text>
           )}
         </Cell>
       )) : <Placeholder>暂无测试记录</Placeholder>}

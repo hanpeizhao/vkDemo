@@ -153,7 +153,10 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
             {runResult.status === 'success' && runResult.result ? (
               <pre>{formatBridgeMethodResult(runResult.result)}</pre>
             ) : (
-              <Text>{runResult.error}</Text>
+              <>
+                <Text>{runResult.error}</Text>
+                {runResult.errorType && <Caption level="1">错误类型：{runResult.errorType}</Caption>}
+              </>
             )}
           </Box>
         )}

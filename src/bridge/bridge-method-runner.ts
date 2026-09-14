@@ -51,11 +51,41 @@ const getErrorType = (error: unknown): string => {
     return 'array';
   }
 
+  if (isRecord(error)) {
+    const bridgeErrorType = error.error_type ?? error.code;
+    if (typeof bridgeErrorType === 'string' && bridgeErrorType.length > 0) {
+      return bridgeErrorType;
+    }
+  }
+
   if (error instanceof Error && error.name.length > 0) {
     return error.name;
   }
 
   return typeof error;
+};
+
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error && error.message.length > 0) {
+    return error.message;
+  }
+
+  if (isRecord(error)) {
+    for (const key of ['error_data', 'message', 'error']) {
+      const value = error[key];
+      if (typeof value === 'string' && value.length > 0) {
+        return value;
+      }
+    }
+
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return 'VK Bridge 返回了无法解析的错误对象';
+    }
+  }
+
+  return String(error);
 };
 
 const getTimeoutMs = (timeoutMs: number | undefined): number => {
@@ -136,7 +166,7 @@ export const runBridgeMethod = async ({
       status: 'error',
       durationMs: getDurationMs(startedAt),
       result: null,
-      error: `调用 ${method} 失败，请检查 VK 环境或参数。`,
+      error: `调用 ${method} 失败：${getErrorMessage(error)}`,
       errorType: getErrorType(error),
     };
   } finally {

@@ -56,6 +56,8 @@ test('日志页将状态映射为中文并显示时间、方法、耗时和原�
   assert.match(logs, /getLogStatusLabel/u);
   assert.match(logs, /entry\.duration/u);
   assert.match(logs, /JSON\.stringify\(entry\.result/u);
+  assert.match(logs, /entry\.error/u);
+  assert.match(logs, /entry\.error\.message/u);
   assert.match(logs, /PanelHeaderBack/u);
   assert.match(logs, /routeNavigator\.back\(\)/u);
 });

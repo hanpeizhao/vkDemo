@@ -29,7 +29,7 @@ export const App = () => {
       status: result.status,
       result: result.result ?? { error: result.error, errorType: result.errorType },
       error: result.error
-        ? { message: result.error, suggestion: '请检查运行环境、权限和传入参数。' }
+        ? { code: result.errorType ?? undefined, message: result.error, suggestion: '请检查运行环境、权限和传入参数。' }
         : undefined,
     };
     logStore.recordMethod(entry);
