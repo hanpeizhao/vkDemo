@@ -22,6 +22,7 @@ export type RunBridgeMethodCardInteractionOptions = Readonly<{
   send: BridgeMethodSend;
   timeoutMs?: number;
   onLog?: (method: BridgeMethod, result: BridgeMethodRunResult) => void;
+  onValidationError?: (method: BridgeMethod, error: string) => void;
   onStateChange: (state: BridgeMethodCardInteractionState) => void;
 }>;
 
@@ -43,11 +44,13 @@ export const runBridgeMethodCardInteraction = async ({
   send,
   timeoutMs,
   onLog,
+  onValidationError,
   onStateChange,
 }: RunBridgeMethodCardInteractionOptions): Promise<BridgeMethodCardInteractionOutcome> => {
   const parsedParams = parseBridgeParams(paramsText);
 
   if (!parsedParams.ok) {
+    onValidationError?.(method, parsedParams.error);
     onStateChange({
       paramsError: parsedParams.error,
       runResult: null,

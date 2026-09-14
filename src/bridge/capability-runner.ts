@@ -1,9 +1,10 @@
 export type BridgeLog = {
   id: string;
   capabilityId: string;
+  method?: string;
   startedAt: number;
   duration: number;
-  status: 'running' | 'success' | 'error';
+  status: 'running' | 'success' | 'error' | 'timeout';
   result?: unknown;
   error?: {
     code?: string;

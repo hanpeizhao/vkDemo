@@ -36,6 +36,7 @@ export type BridgeMethodCardProps = Readonly<{
   method: BridgeMethod;
   send: BridgeMethodSend;
   onLog?: (method: BridgeMethod, result: BridgeMethodRunResult) => void;
+  onValidationError?: (method: BridgeMethod, error: string) => void;
   timeoutMs?: number;
 }>;
 
@@ -59,6 +60,7 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
   method,
   send,
   onLog,
+  onValidationError,
   timeoutMs,
 }) => {
   const [paramsText, setParamsText] = useState(() => formatBridgeMethodDefaultParams(method.defaultParams));
@@ -79,6 +81,7 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
       send,
       timeoutMs,
       onLog,
+      onValidationError,
       onStateChange: handleStateChange,
     });
   };

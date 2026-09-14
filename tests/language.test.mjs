@@ -29,5 +29,5 @@ assert.match(home, /功能分类/u);
 assert.doesNotMatch(home, /\bDiv\b/u, 'Home.tsx 不应继续使用已弃用的 Div');
 
 const persik = await readFile('src/panels/Persik.tsx', 'utf8');
-assert.match(persik, /桃子/u);
-assert.match(persik, /桃子猫咪/u);
+  assert.match(persik, /VK Bridge 方法测试中心/u);
+assert.match(persik, /VK Bridge 方法测试中心/u);

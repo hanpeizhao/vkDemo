@@ -162,3 +162,21 @@ test('卡片使用 fake Bridge 失败和超时时分别恢复 loading、记录�
     assert.equal(lastState?.runResult?.status, failure.status);
   }
 });
+
+test('卡片参数校验失败时将错误交给日志回调且不调用 Bridge', async () => {
+  const stateCollector = collectStates();
+  const validationErrors: string[] = [];
+
+  const outcome = await runBridgeMethodCardInteraction({
+    method: testMethod,
+    paramsText: '{',
+    send: () => {
+      throw new Error('参数校验失败时不应调用 Bridge');
+    },
+    onValidationError: (_method, error) => validationErrors.push(error),
+    onStateChange: stateCollector.onStateChange,
+  });
+
+  assert.deepEqual(outcome, { kind: 'validation-error' });
+  assert.deepEqual(validationErrors, ['参数不是合法的 JSON。']);
+});
