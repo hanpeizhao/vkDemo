@@ -26,6 +26,9 @@ export const Home: FC<HomeProps> = ({ id, fetchedUser, userError }) => {
         )}
       </Group>
       <Group header={<Header size="s">功能分类</Header>}>
+        <Cell onClick={() => routeNavigator.push('/persik')} subtitle="测试 VK Bridge 官方方法">
+          VK Bridge 方法测试中心
+        </Cell>
         {capabilityCategories.filter(({ id: categoryId }) => categoryId !== 'logs').map((category) => (
           <Cell
             key={category.id}
