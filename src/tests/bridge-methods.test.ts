@@ -30,7 +30,7 @@ test('分类 ID 唯一且覆盖十个能力领域', () => {
 });
 
 test('方法名唯一且每条记录包含完整中文元数据', () => {
-  assert.ok(bridgeMethods.length >= 70);
+  assert.equal(bridgeMethods.length, 98);
   assert.equal(new Set(bridgeMethods.map((method) => method.name)).size, bridgeMethods.length);
 
   for (const method of bridgeMethods) {
@@ -55,6 +55,8 @@ test('代表性方法保留官方名称、分类、参数和风险语义', () =>
   const banner = bridgeMethods.find((method) => method.name === 'VKWebAppShowBannerAd');
   const leaderboard = bridgeMethods.find((method) => method.name === 'VKWebAppShowLeaderBoardBox');
   const story = bridgeMethods.find((method) => method.name === 'VKWebAppShowStoryBox');
+  const retargetingPixel = bridgeMethods.find((method) => method.name === 'VKWebAppRetargetingPixel');
+  const conversionHit = bridgeMethods.find((method) => method.name === 'VKWebAppConversionHit');
 
   assert.deepEqual(init, {
     name: 'VKWebAppInit',
@@ -84,6 +86,34 @@ test('代表性方法保留官方名称、分类、参数和风险语义', () =>
   assert.deepEqual(story?.defaultParams, { background_type: 'none' });
   assert.equal(story?.risk, 'high');
   assert.equal(story?.requiresUserAction, true);
+  assert.deepEqual(retargetingPixel?.defaultParams, {
+    pixel_code: 'VK-RTRG-000000-000000',
+    event: 'view',
+  });
+  assert.deepEqual(conversionHit?.defaultParams, {
+    pixel_code: 'VK-RTRG-000000-000000',
+    conversion_event: 'purchase',
+    conversion_value: 0,
+  });
+});
+
+test('默认参数的嵌套数组和对象不可被外部修改', () => {
+  const storageGet = bridgeMethods.find((method) => method.name === 'VKWebAppStorageGet');
+  const callApiMethod = bridgeMethods.find((method) => method.name === 'VKWebAppCallAPIMethod');
+  const storageParams = storageGet?.defaultParams as unknown as { keys: string[] };
+  const callApiParams = callApiMethod?.defaultParams as unknown as { params: { v: string } };
+
+  assert.equal(Object.isFrozen(storageParams.keys), true);
+  assert.throws(() => {
+    storageParams.keys.push('外部修改');
+  }, TypeError);
+  assert.deepEqual(storageGet?.defaultParams, { keys: ['示例键'] });
+
+  assert.equal(Object.isFrozen(callApiParams.params), true);
+  assert.throws(() => {
+    callApiParams.params.v = '外部修改';
+  }, TypeError);
+  assert.deepEqual(callApiMethod?.defaultParams, { method: 'users.get', params: { v: '5.199' } });
 });
 
 test('按分类查询只返回目标分类的方法且不暴露可变注册表', () => {

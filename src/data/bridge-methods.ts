@@ -20,6 +20,16 @@ export type BridgeMethodCategory = Readonly<{
   description: string;
 }>;
 
+type BridgeMethodDefaultParam =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly BridgeMethodDefaultParam[]
+  | Readonly<Record<string, BridgeMethodDefaultParam>>;
+
+type BridgeMethodDefaultParams = Readonly<Record<string, BridgeMethodDefaultParam>>;
+
 export type BridgeMethod = Readonly<{
   name: string;
   title: string;
@@ -27,7 +37,7 @@ export type BridgeMethod = Readonly<{
   description: string;
   risk: BridgeRisk;
   availability: BridgeAvailability;
-  defaultParams: Readonly<Record<string, unknown>>;
+  defaultParams: BridgeMethodDefaultParams;
   requiresParams: boolean;
   requiresUserAction: boolean;
 }>;
@@ -92,10 +102,26 @@ type BridgeMethodDefinition = readonly [
   description: string,
   risk: BridgeRisk,
   availability: BridgeAvailability,
-  defaultParams: Readonly<Record<string, unknown>>,
+  defaultParams: BridgeMethodDefaultParams,
   requiresParams: boolean,
   requiresUserAction: boolean,
 ];
+
+const deepFreeze = <Value extends object>(value: Value): Value => {
+  if (Object.isFrozen(value)) {
+    return value;
+  }
+
+  Object.freeze(value);
+
+  for (const nestedValue of Object.values(value)) {
+    if (nestedValue !== null && typeof nestedValue === 'object') {
+      deepFreeze(nestedValue);
+    }
+  }
+
+  return value;
+};
 
 const method = (definition: BridgeMethodDefinition): BridgeMethod => {
   const [
@@ -117,7 +143,7 @@ const method = (definition: BridgeMethodDefinition): BridgeMethod => {
     description,
     risk,
     availability,
-    defaultParams: Object.freeze({ ...defaultParams }),
+    defaultParams: deepFreeze({ ...defaultParams }),
     requiresParams,
     requiresUserAction,
   });
@@ -228,8 +254,8 @@ const definitions: readonly BridgeMethodDefinition[] = [
   ['VKWebAppAddToMenu', '添加到菜单', 'interface-window', '请求将当前小程序添加到 VK 客户端菜单。', 'medium', 'desktop-web', {}, false, true],
   ['VKWebAppShowInstallPushBox', '展示安装推送框', 'interface-window', '展示安装推送提示框，是否安装由用户决定。', 'medium', 'desktop-web', {}, false, true],
 
-  ['VKWebAppRetargetingPixel', '发送再营销事件', 'analytics', '向 VK 发送再营销像素事件。', 'high', 'vk-container', { event: 'view' }, true, false],
-  ['VKWebAppConversionHit', '发送转化事件', 'analytics', '向 VK 发送转化命中事件。', 'high', 'vk-container', { event: 'complete' }, true, false],
+  ['VKWebAppRetargetingPixel', '发送再营销事件', 'analytics', '向 VK 发送再营销像素事件。', 'high', 'vk-container', { pixel_code: 'VK-RTRG-000000-000000', event: 'view' }, true, false],
+  ['VKWebAppConversionHit', '发送转化事件', 'analytics', '向 VK 发送转化命中事件。', 'high', 'vk-container', { pixel_code: 'VK-RTRG-000000-000000', conversion_event: 'purchase', conversion_value: 0 }, true, false],
   ['VKWebAppTrackEvent', '记录统计事件', 'analytics', '记录小程序的业务统计事件。', 'medium', 'vk-container', { event_name: 'example', event_params: {} }, true, false],
 ] as const;
 
