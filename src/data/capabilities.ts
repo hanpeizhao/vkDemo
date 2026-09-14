@@ -11,6 +11,7 @@ export type Capability = {
   bridgeMethod?: string;
   run?: () => Promise<unknown>;
   demo?: ReactNode;
+  demoId?: 'button' | 'form-controls' | 'feedback' | 'content';
 };
 
 export type CapabilityCategory = {
@@ -52,10 +53,10 @@ export const capabilityCategories: CapabilityCategory[] = [
     description: '查看常用 VKUI 组件的交互和视觉效果。',
     icon: '🧩',
     capabilities: [
-      { id: 'button', title: 'Button 按钮', description: '展示主要、次要和加载状态按钮。', type: 'component' },
-      { id: 'form-controls', title: '表单控件', description: '展示输入框、复选框和选择器。', type: 'component' },
-      { id: 'feedback', title: '反馈组件', description: '展示弹窗、提示条、加载器和占位符。', type: 'component' },
-      { id: 'content', title: '内容组件', description: '展示卡片、头像、标签页和列表内容。', type: 'component' },
+      { id: 'button', title: 'Button 按钮', description: '展示主要、次要和加载状态按钮。', type: 'component', demoId: 'button' },
+      { id: 'form-controls', title: '表单控件', description: '展示输入框、复选框和选择器。', type: 'component', demoId: 'form-controls' },
+      { id: 'feedback', title: '反馈组件', description: '展示弹窗、提示条、加载器和占位符。', type: 'component', demoId: 'feedback' },
+      { id: 'content', title: '内容组件', description: '展示卡片、头像、标签页和列表内容。', type: 'component', demoId: 'content' },
     ],
   },
   {

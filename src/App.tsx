@@ -49,7 +49,10 @@ export const App = () => {
     }
     return runCapability(
       capability.id,
-      () => bridge.send(capability.bridgeMethod as never, bridgeParams[capability.id] as never) as Promise<unknown>,
+      () => Promise.race([
+        bridge.send(capability.bridgeMethod as never, bridgeParams[capability.id] as never) as Promise<unknown>,
+        new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error('Bridge 调用超时')), 8000)),
+      ]),
       handleLog,
     );
   };

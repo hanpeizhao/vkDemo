@@ -32,3 +32,9 @@ test('首页展示能力实验室分类', async () => {
   const categories = await readFile('src/data/capabilities.ts', 'utf8');
   assert.match(categories, /VKUI 组件/u);
 });
+
+test('VK Bridge 初始化调用处理失败 Promise', async () => {
+  const content = await readFile('src/main.tsx', 'utf8');
+  assert.match(content, /VKWebAppInit/u);
+  assert.match(content, /catch/u);
+});
