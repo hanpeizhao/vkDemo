@@ -5,10 +5,7 @@ const filesToCheck = [
   'README.md',
   'src/panels/Home.tsx',
   'src/panels/Persik.tsx',
-  'src/panels/Category.tsx',
   'src/panels/Logs.tsx',
-  'src/components/CapabilityCard.tsx',
-  'src/components/CapabilityResult.tsx',
   'src/App.tsx',
   'src/AppConfig.tsx',
   'src/routes.ts',
@@ -23,9 +20,9 @@ for (const file of filesToCheck) {
 }
 
 const home = await readFile('src/panels/Home.tsx', 'utf8');
-assert.match(home, /能力实验室/u);
-assert.match(home, /基础信息/u);
-assert.match(home, /功能分类/u);
+assert.match(home, /VK 小程序测试中心/u);
+assert.match(home, /VK Bridge 方法测试中心/u);
+assert.match(home, /调试日志/u);
 assert.doesNotMatch(home, /\bDiv\b/u, 'Home.tsx 不应继续使用已弃用的 Div');
 
 const persik = await readFile('src/panels/Persik.tsx', 'utf8');
