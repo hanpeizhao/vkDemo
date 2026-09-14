@@ -20,6 +20,7 @@ import {
   type BridgeMethodRunResult,
   type BridgeMethodSend,
 } from '../bridge/bridge-method-runner';
+import type { BridgeMethodSupportStatus } from '../bridge/bridge-method-support';
 import {
   getBridgeMethodResultTitle,
   runBridgeMethodCardInteraction,
@@ -38,6 +39,7 @@ export type BridgeMethodCardProps = Readonly<{
   onLog?: (method: BridgeMethod, result: BridgeMethodRunResult) => void;
   onValidationError?: (method: BridgeMethod, error: string) => void;
   timeoutMs?: number;
+  supportStatus?: BridgeMethodSupportStatus;
 }>;
 
 const getCategoryTitle = (method: BridgeMethod): string => (
@@ -56,12 +58,32 @@ const getRiskAppearance = (risk: BridgeMethod['risk']): 'accent-green' | 'accent
   return 'accent';
 };
 
+const supportLabels: Record<BridgeMethodSupportStatus, string> = {
+  checking: '正在检测支持情况',
+  supported: '当前平台支持',
+  unsupported: '当前平台不支持',
+  unknown: '暂时无法确定',
+};
+
+const getSupportAppearance = (status: BridgeMethodSupportStatus): 'accent-green' | 'accent' | 'neutral' => {
+  if (status === 'supported') {
+    return 'accent-green';
+  }
+
+  if (status === 'unsupported') {
+    return 'accent';
+  }
+
+  return 'neutral';
+};
+
 export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
   method,
   send,
   onLog,
   onValidationError,
   timeoutMs,
+  supportStatus = 'unknown',
 }) => {
   const [paramsText, setParamsText] = useState(() => formatBridgeMethodDefaultParams(method.defaultParams));
   const [paramsError, setParamsError] = useState<string | null>(null);
@@ -95,6 +117,9 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
           </ContentBadge>
           <ContentBadge mode="secondary" appearance={getRiskAppearance(method.risk)} size="s">
             {getBridgeMethodRiskLabel(method.risk)}
+          </ContentBadge>
+          <ContentBadge mode="secondary" appearance={getSupportAppearance(supportStatus)} size="s">
+            {supportLabels[supportStatus]}
           </ContentBadge>
           {method.requiresUserAction && (
             <ContentBadge mode="secondary" appearance="accent" size="s">

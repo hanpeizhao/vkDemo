@@ -13,6 +13,8 @@ test('Persik 测试中心以注册表渲染分类筛选、方法卡片和容器�
   assert.match(content, /VK Mini App/u);
   assert.match(content, /persik-category-scroll/u);
   assert.match(content, /persik-method-summary/u);
+  assert.match(content, /supportsAsync/u);
+  assert.match(content, /supportStatus/u);
 });
 
 test('Persik 将真实 Bridge send 和日志回调从 App 注入卡片', async () => {
@@ -68,6 +70,8 @@ test('Bridge 方法卡片为移动端和长 JSON 结果提供稳定的响应式�
 
   assert.match(card, /bridge-method-card/u);
   assert.match(card, /bridge-method-result/u);
+  assert.match(card, /当前平台支持/u);
+  assert.match(card, /当前平台不支持/u);
   assert.match(styles, /\.persik-category-scroll[\s\S]*overflow-x:\s*auto/u);
   assert.match(styles, /\.bridge-method-result[\s\S]*overflow-x:\s*auto/u);
   assert.match(styles, /overflow-wrap:\s*anywhere/u);

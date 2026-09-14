@@ -1,9 +1,11 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
+import bridge from '@vkontakte/vk-bridge';
 import { CardGrid, Group, Header, NavIdProps, Panel, PanelHeader, PanelHeaderBack, SegmentedControl, Spacing, Text } from '@vkontakte/vkui';
 import { useRouteNavigator } from '@vkontakte/vk-mini-apps-router';
 import { bridgeMethodCategories, bridgeMethods, type BridgeMethod, type BridgeMethodCategoryId } from '../data/bridge-methods';
 import { BridgeMethodCard } from '../components/BridgeMethodCard';
 import type { BridgeMethodRunResult, BridgeMethodSend } from '../bridge/bridge-method-runner';
+import { getBridgeMethodSupportStatuses, type BridgeMethodSupportStatus } from '../bridge/bridge-method-support';
 
 type PersikProps = NavIdProps & {
   send: BridgeMethodSend;
@@ -15,6 +17,24 @@ export const Persik: FC<PersikProps> = ({ id, send, onLog, onValidationError }) 
   const routeNavigator = useRouteNavigator();
   const [categoryId, setCategoryId] = useState<BridgeMethodCategoryId>(bridgeMethodCategories[0].id);
   const selectedMethods = useMemo(() => bridgeMethods.filter((method) => method.categoryId === categoryId), [categoryId]);
+  const [supportStatuses, setSupportStatuses] = useState<Record<string, BridgeMethodSupportStatus>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const methodNames = selectedMethods.map((method) => method.name);
+    setSupportStatuses(Object.fromEntries(methodNames.map((method) => [method, 'checking' as const])));
+
+    void getBridgeMethodSupportStatuses(methodNames, (method) => bridge.supportsAsync(method as never))
+      .then((statuses) => {
+        if (!cancelled) {
+          setSupportStatuses(statuses);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMethods]);
 
   return (
     <Panel id={id}>
@@ -37,7 +57,14 @@ export const Persik: FC<PersikProps> = ({ id, send, onLog, onValidationError }) 
         <Spacing size="s" />
         <CardGrid className="persik-method-grid" size="l">
           {selectedMethods.map((method) => (
-            <BridgeMethodCard key={method.name} method={method} send={send} onLog={onLog} onValidationError={onValidationError} />
+            <BridgeMethodCard
+              key={method.name}
+              method={method}
+              supportStatus={supportStatuses[method.name] ?? 'checking'}
+              send={send}
+              onLog={onLog}
+              onValidationError={onValidationError}
+            />
           ))}
         </CardGrid>
       </Group>
