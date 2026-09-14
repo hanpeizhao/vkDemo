@@ -1,4 +1,4 @@
-import type { BridgeLog } from '../bridge/capability-runner';
+import type { BridgeLog } from '../bridge/log-types';
 
 export function createBridgeLogStore() {
   let entries: BridgeLog[] = [];

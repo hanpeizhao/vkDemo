@@ -1,6 +1,7 @@
 import { FC } from 'react';
-import { Button, Cell, Group, Header, NavIdProps, Panel, PanelHeader, Placeholder } from '@vkontakte/vkui';
-import type { BridgeLog } from '../bridge/capability-runner';
+import { Button, Cell, Group, Header, NavIdProps, Panel, PanelHeader, PanelHeaderBack, Placeholder } from '@vkontakte/vkui';
+import { useRouteNavigator } from '@vkontakte/vk-mini-apps-router';
+import type { BridgeLog } from '../bridge/log-types';
 
 export type BridgeMethodLog = BridgeLog & {
   method: string;
@@ -26,9 +27,12 @@ const logStatusLabels: Record<BridgeLog['status'], string> = {
 
 const getLogStatusLabel = (entry: BridgeLogEntry): string => logStatusLabels[entry.status];
 
-export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => (
+export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => {
+  const routeNavigator = useRouteNavigator();
+
+  return (
   <Panel id={id}>
-    <PanelHeader fixed={false}>调试日志</PanelHeader>
+    <PanelHeader fixed={false} before={<PanelHeaderBack onClick={() => routeNavigator.back()} />}>调试日志</PanelHeader>
     <Group header={<Header size="s">当前会话记录</Header>}>
       <Button stretched mode="secondary" onClick={onClear}>清空日志</Button>
       {entries.length ? entries.slice().reverse().map((entry) => (
@@ -47,4 +51,5 @@ export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => (
       )) : <Placeholder>暂无测试记录</Placeholder>}
     </Group>
   </Panel>
-);
+  );
+};

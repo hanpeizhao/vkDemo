@@ -35,8 +35,11 @@ test('首页提供 Persik 入口，View 页面保持稳定 ID', async () => {
   const app = await readFile('src/App.tsx', 'utf8');
 
   assert.match(home, /routeNavigator\.push\('\/persik'\)/u);
-  for (const panel of ['home', 'persik', 'basic', 'bridge', 'components', 'layout', 'logs']) {
+  for (const panel of ['home', 'persik', 'logs']) {
     assert.match(app, new RegExp(`<[^>]+ id="${panel}"`, 'u'));
+  }
+  for (const panel of ['basic', 'bridge', 'components', 'layout']) {
+    assert.doesNotMatch(app, new RegExp(`<[^>]+ id="${panel}"`, 'u'));
   }
 });
 
@@ -51,4 +54,6 @@ test('日志页将状态映射为中文并显示时间、方法、耗时和脱�
   assert.match(logs, /getLogStatusLabel/u);
   assert.match(logs, /entry\.duration/u);
   assert.match(logs, /JSON\.stringify\(entry\.result/u);
+  assert.match(logs, /PanelHeaderBack/u);
+  assert.match(logs, /routeNavigator\.back\(\)/u);
 });
