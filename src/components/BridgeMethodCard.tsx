@@ -17,11 +17,14 @@ import {
   bridgeMethodCategories,
 } from '../data/bridge-methods';
 import {
-  parseBridgeParams,
-  runBridgeMethod,
   type BridgeMethodRunResult,
   type BridgeMethodSend,
 } from '../bridge/bridge-method-runner';
+import {
+  getBridgeMethodResultTitle,
+  runBridgeMethodCardInteraction,
+  type BridgeMethodCardInteractionState,
+} from './bridge-method-card-interaction';
 import {
   formatBridgeMethodDefaultParams,
   formatBridgeMethodResult,
@@ -63,32 +66,21 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
   const [runResult, setRunResult] = useState<BridgeMethodRunResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const handleStateChange = (nextState: BridgeMethodCardInteractionState): void => {
+    setParamsError(nextState.paramsError);
+    setRunResult(nextState.runResult);
+    setLoading(nextState.loading);
+  };
+
   const handleRun = async (): Promise<void> => {
-    const parsedParams = parseBridgeParams(paramsText);
-
-    if (!parsedParams.ok) {
-      setParamsError(parsedParams.error);
-      setRunResult(null);
-      return;
-    }
-
-    setParamsError(null);
-    setRunResult(null);
-    setLoading(true);
-
-    try {
-      const nextResult = await runBridgeMethod({
-        method: method.name,
-        params: parsedParams.params,
-        send,
-        timeoutMs,
-      });
-
-      setRunResult(nextResult);
-      onLog?.(method, nextResult);
-    } finally {
-      setLoading(false);
-    }
+    await runBridgeMethodCardInteraction({
+      method,
+      paramsText,
+      send,
+      timeoutMs,
+      onLog,
+      onStateChange: handleStateChange,
+    });
   };
 
   return (
@@ -153,7 +145,7 @@ export const BridgeMethodCard: FC<BridgeMethodCardProps> = ({
         {runResult && (
           <Box paddingBlockStart="m">
             <Text>
-              {runResult.status === 'success' ? '调用成功' : '调用失败'}：{method.name}（{runResult.durationMs} ms）
+              {getBridgeMethodResultTitle(runResult.status)}：{method.name}（{runResult.durationMs} ms）
             </Text>
             {runResult.status === 'success' && runResult.result ? (
               <pre>{formatBridgeMethodResult(runResult.result)}</pre>
