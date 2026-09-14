@@ -1,6 +1,16 @@
 export type BridgeParams = Readonly<Record<string, unknown>>;
 
-export type BridgeParamsParseResult = BridgeParams | Readonly<{ error: string }>;
+export type BridgeParamsParseSuccess = Readonly<{
+  ok: true;
+  params: BridgeParams;
+}>;
+
+export type BridgeParamsParseFailure = Readonly<{
+  ok: false;
+  error: string;
+}>;
+
+export type BridgeParamsParseResult = BridgeParamsParseSuccess | BridgeParamsParseFailure;
 
 export type BridgeMethodSend = (
   method: string,
@@ -63,7 +73,7 @@ const getDurationMs = (startedAt: number): number => Math.max(0, Date.now() - st
 
 export const parseBridgeParams = (text: string): BridgeParamsParseResult => {
   if (text.trim().length === 0) {
-    return {};
+    return { ok: true, params: {} };
   }
 
   let parsed: unknown;
@@ -71,14 +81,14 @@ export const parseBridgeParams = (text: string): BridgeParamsParseResult => {
   try {
     parsed = JSON.parse(text);
   } catch {
-    return { error: '参数不是合法的 JSON。' };
+    return { ok: false, error: '参数不是合法的 JSON。' };
   }
 
   if (!isRecord(parsed)) {
-    return { error: '参数格式错误：仅支持 JSON 对象。' };
+    return { ok: false, error: '参数格式错误：仅支持 JSON 对象。' };
   }
 
-  return parsed;
+  return { ok: true, params: parsed };
 };
 
 export const sanitizeBridgeValue = (value: unknown): unknown => {
@@ -86,6 +96,11 @@ export const sanitizeBridgeValue = (value: unknown): unknown => {
 
   const sanitize = (currentValue: unknown): unknown => {
     if (Array.isArray(currentValue)) {
+      const existingValue = seen.get(currentValue);
+      if (existingValue !== undefined) {
+        return existingValue;
+      }
+
       const sanitizedArray: unknown[] = [];
       seen.set(currentValue, sanitizedArray);
 

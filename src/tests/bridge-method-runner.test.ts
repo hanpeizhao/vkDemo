@@ -9,19 +9,44 @@ import {
   sanitizeBridgeValue,
 } from '../bridge/bridge-method-runner.ts';
 
+test('参数解析以 ok 字段判别结果，并接受含 error 字段的合法参数对象', () => {
+  assert.deepEqual(parseBridgeParams('{"error": "这是合法参数"}'), {
+    ok: true,
+    params: { error: '这是合法参数' },
+  });
+  assert.deepEqual(parseBridgeParams('{'), {
+    ok: false,
+    error: '参数不是合法的 JSON。',
+  });
+});
+
+test('递归脱敏保留自引用数组而不无限递归', () => {
+  const values: unknown[] = [];
+  values.push(values);
+
+  const sanitized = sanitizeBridgeValue(values) as unknown[];
+
+  assert.notEqual(sanitized, values);
+  assert.equal(sanitized[0], sanitized);
+});
+
 test('空文本和 JSON 对象会解析为可调用参数', () => {
-  assert.deepEqual(parseBridgeParams('  \n '), {});
+  assert.deepEqual(parseBridgeParams('  \n '), { ok: true, params: {} });
   assert.deepEqual(parseBridgeParams('{"group_id": 42, "enabled": true}'), {
-    group_id: 42,
-    enabled: true,
+    ok: true,
+    params: {
+      group_id: 42,
+      enabled: true,
+    },
   });
 });
 
 test('非法 JSON 与非对象参数返回可展示的中文错误', () => {
-  assert.deepEqual(parseBridgeParams('{'), { error: '参数不是合法的 JSON。' });
+  assert.deepEqual(parseBridgeParams('{'), { ok: false, error: '参数不是合法的 JSON。' });
 
   for (const text of ['[]', '"文本"', '42', 'null']) {
     assert.deepEqual(parseBridgeParams(text), {
+      ok: false,
       error: '参数格式错误：仅支持 JSON 对象。',
     });
   }
