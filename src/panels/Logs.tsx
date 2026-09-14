@@ -1,11 +1,9 @@
 import { FC } from 'react';
 import { Button, Cell, Group, Header, NavIdProps, Panel, PanelHeader, Placeholder } from '@vkontakte/vkui';
 import type { BridgeLog } from '../bridge/capability-runner';
-import type { BridgeMethodRunStatus } from '../bridge/bridge-method-runner';
 
 export type BridgeMethodLog = BridgeLog & {
   method: string;
-  methodStatus: BridgeMethodRunStatus;
 };
 
 export type BridgeLogEntry = BridgeLog | BridgeMethodLog;
@@ -19,9 +17,14 @@ const getLogMethod = (entry: BridgeLogEntry): string => (
   'method' in entry && typeof entry.method === 'string' ? entry.method : entry.capabilityId
 );
 
-const getLogStatus = (entry: BridgeLogEntry): BridgeLog['status'] | BridgeMethodRunStatus => (
-  'methodStatus' in entry ? entry.methodStatus : entry.status
-);
+const logStatusLabels: Record<BridgeLog['status'], string> = {
+  running: '进行中',
+  success: '成功',
+  error: '失败',
+  timeout: '超时',
+};
+
+const getLogStatusLabel = (entry: BridgeLogEntry): string => logStatusLabels[entry.status];
 
 export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => (
   <Panel id={id}>
@@ -32,7 +35,7 @@ export const Logs: FC<LogsProps> = ({ id, entries, onClear }) => (
         <Cell
           key={entry.id}
           multiline
-          subtitle={`${new Date(entry.startedAt).toLocaleString('zh-CN')} · ${getLogStatus(entry)} · ${entry.duration} 毫秒`}
+          subtitle={`${new Date(entry.startedAt).toLocaleString('zh-CN')} · ${getLogStatusLabel(entry)} · ${entry.duration} 毫秒`}
         >
           {getLogMethod(entry)}
           {entry.result !== undefined && (

@@ -23,6 +23,13 @@ test('Persik 将真实 Bridge send 和日志回调从 App 注入卡片', async (
   assert.match(persik, /onLog=\{onLog\}/u);
 });
 
+test('App 通过 recordMethod 写入方法日志并保留执行器原始状态', async () => {
+  const app = await readFile('src/App.tsx', 'utf8');
+
+  assert.match(app, /^\s*status:\s*result\.status,$/mu);
+  assert.match(app, /logStore\.recordMethod\(entry\)/u);
+});
+
 test('首页提供 Persik 入口，View 页面保持稳定 ID', async () => {
   const home = await readFile('src/panels/Home.tsx', 'utf8');
   const app = await readFile('src/App.tsx', 'utf8');
@@ -33,12 +40,15 @@ test('首页提供 Persik 入口，View 页面保持稳定 ID', async () => {
   }
 });
 
-test('日志页显示时间、方法、状态、耗时和脱敏结果', async () => {
+test('日志页将状态映射为中文并显示时间、方法、耗时和脱敏结果', async () => {
   const logs = await readFile('src/panels/Logs.tsx', 'utf8');
 
   assert.match(logs, /new Date\(entry\.startedAt\)/u);
   assert.match(logs, /getLogMethod/u);
-  assert.match(logs, /entry\.status/u);
+  assert.match(logs, /success:\s*'成功'/u);
+  assert.match(logs, /error:\s*'失败'/u);
+  assert.match(logs, /timeout:\s*'超时'/u);
+  assert.match(logs, /getLogStatusLabel/u);
   assert.match(logs, /entry\.duration/u);
   assert.match(logs, /JSON\.stringify\(entry\.result/u);
 });

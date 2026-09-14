@@ -33,14 +33,13 @@ export const App = () => {
       method: method.name,
       startedAt: finishedAt - result.durationMs,
       duration: result.durationMs,
-      status: result.status === 'success' ? 'success' : 'error',
-      methodStatus: result.status,
+      status: result.status,
       result: result.result ?? { error: result.error, errorType: result.errorType },
       error: result.error
         ? { message: result.error, suggestion: '请检查运行环境、权限和传入参数。' }
         : undefined,
     };
-    logStore.add(entry);
+    logStore.recordMethod(entry);
     setLogs([...logStore.entries]);
   };
   const handleBridgeValidationError = (method: BridgeMethod, error: string) => {
@@ -52,11 +51,10 @@ export const App = () => {
       startedAt,
       duration: 0,
       status: 'error',
-      methodStatus: 'error',
       result: { error },
       error: { message: error, suggestion: '请检查 JSON 参数格式。' },
     };
-    logStore.add(entry);
+    logStore.recordMethod(entry);
     setLogs([...logStore.entries]);
   };
 

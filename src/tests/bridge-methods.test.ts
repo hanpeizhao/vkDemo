@@ -127,3 +127,23 @@ test('按分类查询只返回目标分类的方法且不暴露可变注册表',
     (methods as Array<unknown>).push({});
   }, TypeError);
 });
+
+test('官方 registry 中的所有方法都能按分类筛选并带有风险和可用性标记', () => {
+  const methodsByCategory = bridgeMethodCategories.flatMap((category) =>
+    getBridgeMethodsByCategory(category.id),
+  );
+  const methodNames = new Set(methodsByCategory.map((method) => method.name));
+
+  assert.equal(methodsByCategory.length, bridgeMethods.length);
+  assert.deepEqual(methodNames, new Set(bridgeMethods.map((method) => method.name)));
+
+  for (const method of bridgeMethods) {
+    assert.equal(
+      getBridgeMethodsByCategory(method.categoryId).some((filteredMethod) => filteredMethod.name === method.name),
+      true,
+      `${method.name} 应能从 ${method.categoryId} 分类筛选到`,
+    );
+    assert.ok(['low', 'medium', 'high'].includes(method.risk));
+    assert.ok(['all', 'vk-container', 'desktop-web', 'mobile'].includes(method.availability));
+  }
+});
