@@ -9,7 +9,7 @@
 安装依赖后运行开发服务器：
 
 ```sh
-yarn start
+npm run start -- --host
 ```
 
 打开 [VK 开发者平台](https://dev.vk.ru/)，或进入 [小程序管理页面](https://vk.ru/apps?act=manage) 创建一个新的小程序。
@@ -21,7 +21,7 @@ yarn start
 如果要将小程序托管到 VK 服务器，请先打开 `vk-hosting-config.json`，填写你的小程序 ID，然后运行部署脚本：
 
 ```sh
-yarn run deploy
+npm run deploy
 ```
 
 ## 🧪 VK 小程序测试中心
