@@ -208,7 +208,6 @@ const definitions: readonly BridgeMethodDefinition[] = [
   ['VKWebAppStorageGet', '读取存储', 'storage-security', '读取当前小程序保存的键值数据。', 'low', 'vk-container', { keys: ['example'] }, true, false],
   ['VKWebAppStorageSet', '写入存储', 'storage-security', '写入当前小程序的键值数据。', 'medium', 'vk-container', { key: 'example', value: 'example_value' }, true, false],
 
-  ['VKWebAppGetUserFiles', '获取用户文件', 'files-media', '打开文件选择流程并返回用户选择的文件。', 'medium', 'vk-container', {}, false, true],
   ['VKWebAppDownloadFile', '下载文件', 'files-media', '请求 VK 客户端下载指定文件。', 'medium', 'vk-container', { url: 'https://sun9-65.userapi.com/c850136/v850136098/1b77eb/0YK6suXkY24.jpg', filename: 'image.jpg' }, true, true],
   ['VKWebAppShowImages', '预览图片', 'files-media', '在 VK 客户端图片查看器中预览图片列表。', 'low', 'vk-container', { images: ['https://sun9-65.userapi.com/c850136/v850136098/1b77eb/0YK6suXkY24.jpg'] }, true, false],
   ['VKWebAppOpenCodeReader', '打开扫码器', 'files-media', '打开客户端扫码器并返回扫描结果。', 'medium', 'mobile', {}, false, true],
